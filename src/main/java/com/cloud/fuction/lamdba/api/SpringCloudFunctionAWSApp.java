@@ -1,5 +1,6 @@
 package com.cloud.fuction.lamdba.api;
 
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.cloud.fuction.lamdba.api.model.Order;
 import com.cloud.fuction.lamdba.api.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,10 @@ public class SpringCloudFunctionAWSApp {
     }
 
     @Bean
-    public Function<String, List<Order>> findByName(){
-        return (input) -> orderRepository.prepareOrders().stream().filter(order -> order.getName().equals(input)).collect(Collectors.toList());
+    public Function<APIGatewayProxyRequestEvent, List<Order>> findByName(){
+        return (requestEvent) -> orderRepository.prepareOrders()
+                .stream()
+                .filter(order -> order.getName().equals(requestEvent.getQueryStringParameters().get("orderName")))
+                .collect(Collectors.toList());
     }
 }
